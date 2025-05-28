@@ -1,0 +1,22 @@
+{
+  "devices": [
+    {
+      "id": "device1",
+      "floor": "1",
+      "name": "AC Unit 1",
+      "status": "ON"
+    },
+    {
+      "id": "device2",
+      "floor": "2",
+      "name": "AC Unit 2",
+      "status": "OFF"
+    },
+    {
+      "id": "859e",
+      "floor": "1",
+      "name": "waf",
+      "status": "ON"
+    }
+  ]
+}

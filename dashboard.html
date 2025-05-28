@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>HVAC Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid white;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background-color: black;
+    }
+
+    form {
+      margin-top: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container dashboard-container">
+    <h2>HVAC Dashboard</h2>
+    <p>Live device list per floor:</p>
+
+    <table id="deviceTable">
+      <thead>
+        <tr>
+          <th>Sl No</th>
+          <th>Floor Number</th>
+          <th>Device ID</th>
+          <th>Device Name</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Device rows will be populated dynamically -->
+      </tbody>
+    </table>
+
+    <h3>Add New Device</h3>
+    <form id="deviceForm">
+      <input type="text" name="floor" placeholder="Floor Number" required>
+      <input type="text" name="name" placeholder="Device Name" required>
+      <input type="text" name="status" placeholder="Status (e.g., ON/OFF)" required>
+      <button type="submit">Add Device</button>
+    </form>
+  </div>
+
+  <script>
+    async function fetchDevices() {
+      try {
+        const response = await fetch('http://localhost:3000/devices');
+        const devices = await response.json();
+
+        const tbody = document.querySelector('#deviceTable tbody');
+        tbody.innerHTML = ''; // clear existing rows
+
+        devices.forEach((device, index) => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${device.floor}</td>
+            <td>${device.id}</td>
+            <td>${device.name}</td>
+            <td>${device.status}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (error) {
+        console.error('Error fetching devices:', error);
+      }
+    }
+
+    // Handle form submission
+    document.getElementById('deviceForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const form = e.target;
+      const data = {
+        floor: form.floor.value,
+        name: form.name.value,
+        status: form.status.value
+      };
+
+      try {
+        const response = await fetch('http://localhost:3000/devices', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+          form.reset();
+          fetchDevices(); // refresh list
+        } else {
+          alert('Failed to add device.');
+        }
+      } catch (err) {
+        console.error('Error adding device:', err);
+      }
+    });
+
+    // Fetch devices on page load
+    window.onload = fetchDevices;
+  </script>
+</body>
+</html>
